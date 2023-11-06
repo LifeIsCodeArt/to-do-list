@@ -10,26 +10,37 @@ const props = defineProps({
   },
   modelValue: String
 })
- defineEmits(["modelValue",'deleteList'])
+
+defineEmits(["modelValue",'deleteList','dragDropEvent'])
+
+const setCurrentTaskEl = (id) => {
+  if(localStorage.getItem('setCurrentTaskBoardEl') == id) {
+    console.log('This id currently used')
+  }
+  else{
+    localStorage.setItem('setCurrentTaskBoardEl',id.toString())
+    console.log(localStorage.getItem('currentTaskBoardId'))
+  }
+}
+
+
+
 const setNewTask = ref(true)
 const setNewColor = ref(true)
 const newTaskValue = ref('')
 const activeColor = ref(1)
-/*const addNewValue = () =>{
-  if(newTaskValue){
-    localStorage.setItem('NewTask',newTaskValue.value)
-    console.log(localStorage.getItem('NewTask'))
-    setNewTask.value = true
-  }
-  else{
-    console.log('value of the task is 0')
-    setNewTask.value = true
-  }
-}*/
+
 const setCurrentColor = (number) =>{
   activeColor.value = number
   setNewColor.value = true
   console.log(activeColor.value)
+}
+const dragStartEvent = (event, item) =>{
+  console.log(item)
+  event.dataTransfer.dropEffect = 'move'
+  event.dataTransfer.effectAllowed = 'move'
+  event.dataTransfer.setData('itemID',item)
+  console.log(event.dataTransfer.getData('itemID'))
 }
 </script>
 
@@ -62,8 +73,19 @@ const setCurrentColor = (number) =>{
         <img src="../components/icons/close-svgrepo-com.svg"  alt="" class="h-[30px] w-[35px]">
       </button>
     </div>
-    <ul class="w-full p-[15px]">
-      <li class="w-full h-[60px] whitespace-nowrap overflow-hidden overflow-ellipsis cardo  text-[16px] bg-white rounded my-6 flex justify-center items-center p-2 font-normal" v-for="item in itemValue" :key="item.index"><p>{{item}}</p></li>
+    <ul class="w-full p-[15px]"
+        @drop="$emit('dragDropEvent',$event)"
+        @dragover.prevent
+        @dragenter.prevent>
+      <li class="w-full h-[60px] whitespace-nowrap overflow-hidden overflow-ellipsis cardo  text-[16px] bg-white rounded my-6 flex justify-center items-center p-2 font-normal" v-for="value in itemValue" :key="value.index"
+      @dragstart="dragStartEvent($event, value.text)"
+      draggable="true"
+      @click="setCurrentTaskEl(value.Tasks)"
+      >
+        <p>
+          {{value.text}}
+        </p>
+      </li>
     </ul>
     <div class="mb-8 flex flex-col justify-around items-center ">
       <div class="my-4" v-show="!setNewTask">
@@ -73,7 +95,7 @@ const setCurrentColor = (number) =>{
                 'second: text-white':activeColor === 2,
                 'third: text-white':activeColor === 3,
                 'fourth: text-black':activeColor === 4,
-                'fifth: text-black':activeColor === 5}"> <!--@click="$emit('setNewTask', newTaskValue)"--> X</button>
+                'fifth: text-black':activeColor === 5}">X</button>
         </div>
       </div>
       <button class="rounded-xl w-[50px] h-[40px] bg-white" v-show="setNewTask" @click="setNewTask = !setNewTask">+</button>

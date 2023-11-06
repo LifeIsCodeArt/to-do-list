@@ -6,13 +6,13 @@ const addNewTask = ref('')
 const onInput = (e) =>{
   addNewTask.value = e.target.value
   if(e.code === 'Enter') {
-    dynamicRenderingLists.value[localStorage.getItem('currentTaskBoardId')-1].Tasks.push(e.target.value)
+    console.log(dynamicRenderingLists.value[localStorage.getItem('currentTaskBoardId')-1].Tasks)
+    dynamicRenderingLists.value[localStorage.getItem('currentTaskBoardId')-1].Tasks.push({id:dynamicRenderingLists.value[localStorage.getItem('currentTaskBoardId')-1].Tasks.length+1, text:`${e.target.value}`})
 
   }
 }
 
 const deleteList = () => {
-  /*toDoLists.splice(Number(localStorage.getItem('currentTaskBoardId')),1)*/
   if(Number(localStorage.getItem('currentTaskBoardId')-1) === 0){
     dynamicRenderingLists.value.shift()
     console.log('Impossible to cut meat 1111')
@@ -31,19 +31,10 @@ const deleteList = () => {
       dynamicRenderingLists.value.splice(Number(localStorage.getItem('currentTaskBoardId')-1),1)
     }
   }
-
-  console.log(dynamicRenderingLists.value.length)
-  console.log(dynamicRenderingLists.value)
-    console.log(toDoLists)
 }
 
 const createList = () =>{
   if(toDoLists.length>0) {
-    toDoLists.splice(
-        dynamicRenderingLists.value.length, 1, {id:dynamicRenderingLists.value.length + 1, Tasks:[], Header:'Hello, we need to go!'})
-    console.log(dynamicRenderingLists.value.length)
-  }
-  else{
     toDoLists.splice(
         dynamicRenderingLists.value.length, 1, {id:dynamicRenderingLists.value.length + 1, Tasks:[], Header:'Hello, we need to go!'})
     console.log(dynamicRenderingLists.value.length)
@@ -54,32 +45,32 @@ const toDoLists = [
     {
       id:1,
       Header:'Things to do',
-      Tasks:['Task 1', 'Task 2'],
+      Tasks:[{id:1, text:'Task 1'}, {id:2, text:'Task 2'}],
     },
   {
     id:2,
     Header:'Things to do',
-    Tasks:['Task 3', 'Task 4']
+    Tasks:[{id:1, text:'Task 1'}, {id:2, text:'Task 2'}]
   },
   {
     id:3,
     Header:'Things to do',
-    Tasks:['Task 5', 'Task 6']
+    Tasks:[{id:1, text:'Task 1'}, {id:2, text:'Task 2'}]
   },
   {
     id:4,
     Header:'Things to do',
-    Tasks:['Task 7', 'Task 8']
+    Tasks:[{id:1, text:'Task 1'}, {id:2, text:'Task 2'}]
   },
   {
     id:5,
     Header:'Things to do',
-    Tasks:['Task 9', 'Task 10']
+    Tasks:[{id:1, text:'Task 1'}, {id:2, text:'Task 2'}]
   },
   {
     id:6,
     Header:'Things to do',
-    Tasks:['Task 11', 'Task 12']
+    Tasks:[{id:1, text:'Task 1'}, {id:2, text:'Task 2'}]
   },
 
 ]
@@ -95,6 +86,14 @@ const setCurrentTaskBoardId = (id) => {
   }
 }
 
+const dragDropEvent = (event) =>{
+  const itemID = event.dataTransfer.getData('itemID')
+  dynamicRenderingLists.value[localStorage.getItem('currentTaskBoardId')-1].Tasks.push({id:dynamicRenderingLists.value[localStorage.getItem('currentTaskBoardId')-1].Tasks.length+1, text:itemID})
+ const actualEl =  dynamicRenderingLists.value[localStorage.getItem('currentTaskBoardId')].Tasks.filter(el => el.text === event.dataTransfer.getData('itemID'))
+  console.log(Number(actualEl[0].id-1))
+  dynamicRenderingLists.value[localStorage.getItem('currentTaskBoardId')].Tasks.splice(Number(actualEl[0].id),1)
+  console.log(dynamicRenderingLists.value[localStorage.getItem('currentTaskBoardId')].Tasks.splice(actualEl[0].id,1))
+}
 
 </script>
 
@@ -102,7 +101,16 @@ const setCurrentTaskBoardId = (id) => {
   <button class="" @click="createList">e2w</button>
   <div class="h-auto mb-48 mt-10">
     <div class=" flex flex-wrap">
-        <ToDoList v-for="item in dynamicRenderingLists" @deleteList="deleteList" v-model="addNewTask" @mousemove="onInput" @keydown="onInput" :key="item.id" :item-value="item.Tasks" :value="item" @click="setCurrentTaskBoardId(item.id)" @setNewTask=''></ToDoList>
+        <ToDoList v-for="item in dynamicRenderingLists"
+                  @deleteList="deleteList"
+                  v-model="addNewTask"
+                  @mousemove="onInput"
+                  @keydown="onInput"
+                  :key="item.id"
+                  :item-value="item.Tasks"
+                  :value="item"
+                  @mouseenter="setCurrentTaskBoardId(item.id)"
+                  @dragDropEvent="dragDropEvent($event)"></ToDoList>
     </div>
   </div>
 </template>
