@@ -8,18 +8,17 @@ const props = defineProps({
   itemValue: {
     type: Array,
   },
-  modelValue: String
+  modelValue: Number
 })
 
 defineEmits(["modelValue",'deleteList','dragDropEvent'])
 
 const setCurrentTaskEl = (id) => {
-  if(localStorage.getItem('setCurrentTaskBoardEl') == id) {
+  if(localStorage.getItem('setCurrentTaskBoardEl') !== id) {
     console.log('This id currently used')
   }
   else{
     localStorage.setItem('setCurrentTaskBoardEl',id.toString())
-    console.log(localStorage.getItem('currentTaskBoardId'))
   }
 }
 
@@ -33,14 +32,12 @@ const activeColor = ref(1)
 const setCurrentColor = (number) =>{
   activeColor.value = number
   setNewColor.value = true
-  console.log(activeColor.value)
+
 }
 const dragStartEvent = (event, item) =>{
-  console.log(item)
   event.dataTransfer.dropEffect = 'move'
   event.dataTransfer.effectAllowed = 'move'
   event.dataTransfer.setData('itemID',item)
-  console.log(event.dataTransfer.getData('itemID'))
 }
 </script>
 
@@ -77,7 +74,7 @@ const dragStartEvent = (event, item) =>{
         @drop="$emit('dragDropEvent',$event)"
         @dragover.prevent
         @dragenter.prevent>
-      <li class="w-full h-[60px] whitespace-nowrap overflow-hidden overflow-ellipsis cardo  text-[16px] bg-white rounded my-6 flex justify-center items-center p-2 font-normal" v-for="value in itemValue" :key="value.index"
+      <li class="cursor-pointer w-full h-[60px] whitespace-nowrap overflow-hidden overflow-ellipsis cardo  text-[16px] bg-white rounded my-6 flex justify-center items-center p-2 font-normal" v-for="value in itemValue" :key="value.index"
       @dragstart="dragStartEvent($event, value.text)"
       draggable="true"
       @click="setCurrentTaskEl(value.Tasks)"
