@@ -1,8 +1,9 @@
 <script setup>
-import {ref,computed} from "vue";
+import {ref,computed,provide} from "vue";
 import ToDoList from '../components/ToDoList.vue'
 
 const addNewTask = ref('')
+
 const onInput = (e) =>{
   addNewTask.value = e.target.value
   if(e.code === 'Enter') {
@@ -54,28 +55,26 @@ const createList = () =>{
           Header:'Hello, we need to go!'
         }
     )
-
   }
 }
 
 const toDoLists = ref([
     {
       id:1,
-      Header:'Things to do',
+      Header:'Things to do 1',
       Tasks:[{id:1, text:'Task 1'},
-            {id:2, text:'Task 2'}
             ]
     },
   {
     id:2,
-    Header:'Things to do',
+    Header:'Things to do 2',
     Tasks:[{id:1, text:'Task 3'},
            {id:2, text:'Task 4'}
           ]
   },
   {
     id:3,
-    Header:'Things to do',
+    Header:'Things to do 3',
     Tasks:[
         {id:1, text:'Task 5'},
         {id:2, text:'Task 6'}
@@ -83,7 +82,7 @@ const toDoLists = ref([
   },
   {
     id:4,
-    Header:'Things to do',
+    Header:'Things to do 4',
     Tasks:[
         {id:1, text:'Task 7'},
         {id:2, text:'Task 8'}
@@ -91,7 +90,7 @@ const toDoLists = ref([
   },
   {
     id:5,
-    Header:'Things to do',
+    Header:'Things to do 5',
     Tasks:[
         {id:1, text:'Task 9'},
         {id:2, text:'Task 10'}
@@ -99,7 +98,7 @@ const toDoLists = ref([
   },
   {
     id:6,
-    Header:'Things to do',
+    Header:'Things to do 6',
     Tasks:[
         {id:1, text:'Task 11'},
         {id:2, text:'Task 12'}
@@ -129,6 +128,20 @@ const dragDropEvent = (event, id) =>{
   )
 }
 
+
+const moveListToTheLeft = (id) => {
+  [dynamicRenderingLists.value[id-2], dynamicRenderingLists.value[id-1]]  = [dynamicRenderingLists.value[id-1], dynamicRenderingLists.value[id-2]]
+  const holder = dynamicRenderingLists.value[id-2].id
+  dynamicRenderingLists.value[id-2].id = dynamicRenderingLists.value[id-1].id
+  dynamicRenderingLists.value[id-1].id = holder
+}
+const moveListToTheRight = (id) =>{
+  [dynamicRenderingLists.value[id-1], dynamicRenderingLists.value[id]]  = [dynamicRenderingLists.value[id], dynamicRenderingLists.value[id-1]]
+  const holder = dynamicRenderingLists.value[id-1].id
+  dynamicRenderingLists.value[id-1].id = dynamicRenderingLists.value[id].id
+  dynamicRenderingLists.value[id].id = holder
+}
+
 </script>
 
 <template>
@@ -144,7 +157,9 @@ const dragDropEvent = (event, id) =>{
                   :item-value="item.Tasks"
                   :value="item"
                   @mouseenter="setCurrentTaskBoardId(item.id)"
-                  @dragDropEvent="dragDropEvent($event, item.id)"></ToDoList>
+                  @dragDropEvent="dragDropEvent($event, item.id)"
+                  @moveListToTheLeft="moveListToTheLeft(item.id)"
+                  @moveListToTheRight="moveListToTheRight(item.id)"></ToDoList>
     </div>
   </div>
 </template>

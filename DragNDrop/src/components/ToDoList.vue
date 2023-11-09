@@ -1,5 +1,5 @@
 <script setup>
-import {computed, defineProps, ref,} from "vue";
+import {computed, defineProps, ref, inject} from "vue";
 const props = defineProps({
   value: {
     type: Object,
@@ -11,7 +11,7 @@ const props = defineProps({
   modelValue: Number
 })
 
-defineEmits(["modelValue",'deleteList','dragDropEvent'])
+defineEmits(["modelValue",'deleteList','dragDropEvent','moveListToTheRight','moveListToTheLeft'])
 
 const setCurrentTaskEl = (id) => {
   if(localStorage.getItem('setCurrentTaskBoardEl') !== id) {
@@ -21,8 +21,6 @@ const setCurrentTaskEl = (id) => {
     localStorage.setItem('setCurrentTaskBoardEl',id.toString())
   }
 }
-
-
 
 const setNewTask = ref(true)
 const setNewColor = ref(true)
@@ -48,6 +46,7 @@ const dragStartEvent = (event, item) =>{
                 'third: bg-[#AB400C]':activeColor === 3,
                 'fourth: bg-[#965B80]':activeColor === 4,
                 'fifth: bg-[#C1AD43]':activeColor === 5}">
+
     <h1 class="px-[15px] pt-[30px] text-[22px] font-bold text-center roboto rounded-t-xl" :class="{
                 'first: text-white':activeColor === 1,
                 'second: text-white':activeColor === 2,
@@ -55,6 +54,7 @@ const dragStartEvent = (event, item) =>{
                 'fourth: text-white':activeColor === 4,
                 'fifth: text-black':activeColor === 5}">
       {{props.value.Header}}</h1>
+    <p class="">{{props.value.id}}</p>
     <div v-show="!setNewColor" class="w-[150px] h-[40px] absolute top-[-50px] right-0 flex justify-around items-center border-2 rounded-xl">
       <div class=""><button @click="setCurrentColor(1) "  class="bg-[#BBCCDD] w-[20px] mt-[5px] h-[20px]"></button></div>
       <div class=""><button @click="setCurrentColor(2) " class="bg-[#8C7E90] w-[20px] mt-[5px] h-[20px]"></button></div>
@@ -69,6 +69,14 @@ const dragStartEvent = (event, item) =>{
       <button class="hover:bg-red-500 hover:duration-300 rounded-xl h-[40px]" @click="$emit('deleteList')" title="Delete a list">
         <img src="../components/icons/close-svgrepo-com.svg"  alt="" class="h-[30px] w-[35px]">
       </button>
+    </div>
+    <div class="absolute top-[0px] left-[0px] flex">
+      <button @click="$emit('moveListToTheLeft')" class="" :class="{
+                'first: pointer-events:none bg-red-300 cursor-auto':props.value.id === 1,
+                }"><img src="../components/icons/chevron-left-svgrepo-com.svg" alt="" width="30" height="20"></button>
+      <button @click="$emit('moveListToTheRight')" class="" :class="{
+                'first: text-white':props.value.id === props,
+                'second: text-white':activeColor === 2}"><img src="../components/icons/chevron-right-svgrepo-com.svg" alt="" width="30" height="20"></button>
     </div>
     <ul class="w-full p-[15px]"
         @drop="$emit('dragDropEvent',$event)"
